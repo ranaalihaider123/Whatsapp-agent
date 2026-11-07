@@ -1,28 +1,43 @@
-const { Client, LocalAuth } = require('whatsapp-web.js');
+const { default: makeWASocket, useMultiFileAuthState } = require('@whiskeysockets/baileys');
 const express = require('express');
 const qrcode = require('qrcode');
+const pino = require('pino');
 const app = express();
 let lastQR = '';
-console.log('Starting bot...');
-
-const client = new Client({
-  authStrategy: new LocalAuth(),
-  puppeteer: {
-    headless: true,
-    args: ['--no-sandbox','--disable-setuid-sandbox','--disable-dev-shm-usage','--disable-accelerated-2d-canvas','--no-first-run','--no-zygote','--single-process','--disable-gpu']
-  }
-});
-
-app.get('/', (req,res) => res.send('Bot is ON - Go to /qr'));
+app.get('/', (req,res) => res.send('Bot ON'));
 app.get('/qr', async (req,res) => {
-  if(!lastQR) return res.send('QR abhi ready nahi, 30 second baad refresh karo. LastQR empty hai.');
+  if(!lastQR) return res.send('Bot is Connected - No QR needed');
   const img = await qrcode.toDataURL(lastQR);
-  res.send(`<h1>Scan Karo</h1><img src="${img}" style="width:300px"><script>setTimeout(()=>location.reload(),10000)</script>`);
+  res.send(`<h1>Scan QR</h1><img src="${img}" style="width:300px"><script>setTimeout(()=>location.reload(),8000)</script>`);
 });
 app.listen(10000, () => console.log('Server running'));
-
-client.on('qr', qr => { lastQR = qr; console.log('QR READY - Open /qr to scan'); });
-client.on('ready', () => console.log('BOT READY!'));
-client.on('auth_failure', m => console.log('AUTH FAIL: ' + m));
-client.on('disconnected', r => console.log('DISCONNECTED: ' + r));
-client.initialize().then(()=>console.log('Initialize done')).catch(e=>console.log('INIT ERROR: '+e.message));
+async function getAIReply(userMsg) {
+  try {
+    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ contents: [{ parts: [{ text: `You are Rana Ali Haider's personal assistant on WhatsApp. Polite, helpful, professional, reply in same language as user (Urdu/English/Roman Urdu). Keep replies short, max 3-4 lines. If user asks price/timing/location and you don't know, say Rana Ali will confirm. User said: ${userMsg}` }] }] })
+    });
+    const data = await res.json();
+    return data.candidates?.[0]?.content?.parts?.[0]?.text || "Sorry, samajh nahi aaya. Dobara batayein?";
+  } catch(e) { return "Sorry, thora masla hua hai. Rana Ali Haider jald rabta karenge."; }
+}
+async function start() {
+  const { state, saveCreds } = await useMultiFileAuthState('auth');
+  const sock = makeWASocket({ auth: state, logger: pino({level:'silent'}) });
+  sock.ev.on('creds.update', saveCreds);
+  sock.ev.on('connection.update', (u) => {
+    if(u.qr){ lastQR = u.qr; console.log('QR READY'); }
+    if(u.connection === 'open'){ console.log('BOT READY!'); lastQR=''; }
+    if(u.connection === 'close'){ console.log('Disconnected - Retrying'); start(); }
+  });
+  sock.ev.on('messages.upsert', async ({messages}) => {
+    const m = messages[0];
+    if(!m.message || m.key.fromMe) return;
+    const text = m.message.conversation || m.message.extendedTextMessage?.text || '';
+    if(!text) return;
+    const reply = await getAIReply(text);
+    await sock.sendMessage(m.key.remoteJid, { text: reply });
+  });
+}
+start();
