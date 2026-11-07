@@ -10,9 +10,10 @@ client.on('ready', () => console.log('BOT READY!'));
 client.on('message', async msg => { if(msg.fromMe) return; await msg.reply('Salam! Main Rana Ali Haider ka Agent hoon. Aapka message mil gaya.'); });
 
 client.initialize();
-client.on('ready', async () => {
+
+setTimeout(async () => {
   try {
     const code = await client.requestPairingCode('923027029179');
     console.log('PAIRING CODE: ' + code);
   } catch(e){ console.log('Pairing error: ' + e.message); }
-});
+}, 8000);
