@@ -1,56 +1,51 @@
 const { Client, LocalAuth } = require('whatsapp-web.js');
 const qrcode = require('qrcode-terminal');
 const express = require('express');
+
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 10000;
 
 app.get('/', (req, res) => {
-    res.send('Agent is Running 24/7!');
+  res.send('WhatsApp Agent is running. Check Render Logs for QR code.');
 });
-app.listen(PORT, () => console.log('Server running on port ' + PORT));
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
+
+console.log('Starting WhatsApp client...');
+
 const client = new Client({
-    authStrategy: new LocalAuth(),
-    puppeteer: {
-        headless: true,
-        args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage', '--disable-accelerated-2d-canvas', '--no-first-run', '--no-zygote', '--disable-gpu']
-    },
-    webVersionCache: {
-        type: 'remote',
-        remotePath: 'https://raw.githubusercontent.com/wppconnect-team/wa-version/main/html/2.2412.54.html'
-    }
+  authStrategy: new LocalAuth(),
+  puppeteer: {
+    headless: true,
+    args: [
+      '--no-sandbox',
+      '--disable-setuid-sandbox',
+      '--disable-dev-shm-usage',
+      '--disable-accelerated-2d-canvas',
+      '--no-first-run',
+      '--no-zygote',
+      '--disable-gpu'
+    ]
+  }
 });
 
 client.on('qr', (qr) => {
-    console.log('SCAN THIS QR:');
-    qrcode.generate(qr, { small: true });
+  console.log('QR_RECEIVED - Scan this QR code:');
+  qrcode.generate(qr, { small: true });
 });
 
 client.on('ready', () => {
-    console.log('Smart Agent is Ready!');
+  console.log('WhatsApp Client is READY!');
 });
 
-client.on('message', async (msg) => {
-    if (msg.fromMe) return;
-    if (msg.from.includes('status')) return;
-    let text = msg.body.toLowerCase().trim();
-    console.log('Message:', msg.body);
-    let reply = '';
-    if (text.includes('salam') || text.includes('assalam')) {
-        reply = 'Walaikum Assalam! Kya haal hai? Main aapka Agent hoon, online hoon.';
-    } else if (text === 'hi' || text === 'hello' || text === 'hey') {
-        reply = 'Hello! I am your Agent. I am online. Kya help chahiye?';
-    } else if (text.includes('kya haal') || text.includes('kesy ho') || text.includes('how are you')) {
-        reply = 'Main bilkul theek hoon, Alhamdulillah! Aap sunao, kya haal hai?';
-    } else if (text.includes('where are you') || text.includes('kahan ho')) {
-        reply = 'Main yahin hoon, online! Aapka Agent aapki khidmat mein hazir hai.';
-    } else if (text.includes('allah hafiz') || text.includes('bye') || text.includes('khuda hafiz')) {
-        reply = 'Allah Hafiz! Apna khayal rakhna.';
-    } else if (text.includes('kon ho') || text.includes('who are you')) {
-        reply = 'Main Rana Ali Haider ka Smart Agent hoon. Aapko kisi cheez mein help chahiye?';
-    } else {
-        reply = 'Aapka message mil gaya: "' + msg.body + '". Rana Ali Haider abhi busy hain, wo jald reply karein ge. Shukriya!';
-    }
-    msg.reply(reply);
+client.on('auth_failure', (msg) => {
+  console.log('AUTH_FAILURE:', msg);
+});
+
+client.on('disconnected', (reason) => {
+  console.log('DISCONNECTED:', reason);
 });
 
 client.initialize();
