@@ -73,7 +73,7 @@ async function getAIReply(userMsg, userId) {
   }
 
   // 3. WHERE ARE YOU / WHAT DOING
-  if (msg.includes("where are you") || msg.includes("kahan ho") || msg.includes("kidhar ho") || msg.includes("kaha ho") || msg.includes("kahan hai")) {
+  if (msg.includes("where are you") || msg.includes("kahan ho") || msg.includes("kidhar ho") || msg.includes("kaha ho") || msg.includes("Oye")) {
     return random([
       "Main yahin hoon, online! Aapka Agent aapki khidmat me hazir hai.",
       "Main yahin hoon, aapke paas hi samjho! Online hoon, batao kya kaam hai?",
@@ -171,7 +171,7 @@ async function getAIReply(userMsg, userId) {
 
   // 10. QUESTIONS - KYA, KYUN, KESE, KAB, KAHAN
   if (msg.includes("kya hai") || msg.includes("what is") || msg.includes("kia hai")) {
-    return "Acha sawal hai! Aapne poocha: " + userMsg + " - Iske bare me main aapko batata hoon, thora detail me samjhao to? Aapko iska kis kaam ke liye chahiye? Taake main sahi jawab du.";
+    return "Acha sawal hai! Aapne poocha: " + userMsg + " - Iske bare me Mujhe nhi pta Rana Sb free ho kr btate han      Main sirf aik agent hoon.";
   }
   if (msg.includes("kyun") || msg.includes("why") || msg.includes("kion")) {
     return "Acha, aap pooch rahe ho kyun? Dekho, har cheez ki wajah hoti hai. Aapne poocha: " + userMsg + " - Mujhe thora aur batao, aapko kis cheez ka kyun jaanna hai? Main detail me samjha dunga.";
@@ -186,10 +186,11 @@ async function getAIReply(userMsg, userId) {
   // 11. GENERIC - FOR ANY OTHER MESSAGE - SMART REPLY, NEVER BUSY
   if (msg.length < 35) {
     return random([
-      "Acha, " + userMsg + " - Theek hai, samajh gaya",
-      "Hmm, " + userMsg + " - Hmmm🙂",
+      "Acha, " + userMsg + " - G",
+      "Hmm, " + userMsg + " - Oh Yeah",
+      "kiya," + userMsg + " -Ap Mujh se nhi Rana Sb se he bat krna ",
       "Acha acha, " + userMsg + " - Good! ",
-      "Samajh gaya, " + userMsg + " - Rana Ali Haider ko bata du kya is bare me?"
+      "Samajh gaya, " + userMsg + " - Rana Ali Haider ko batani han ye batein?"
     ]);
   }
 
