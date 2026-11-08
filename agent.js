@@ -186,9 +186,9 @@ async function getAIReply(userMsg, userId) {
   // 11. GENERIC - FOR ANY OTHER MESSAGE - SMART REPLY, NEVER BUSY
   if (msg.length < 35) {
     return random([
-      "Acha, " + userMsg + " - Theek hai, samajh gaya. Aur batao, aage kya plan hai?",
-      "Hmm, " + userMsg + " - Interesting! Aur sunao, kya naya hai?",
-      "Acha acha, " + userMsg + " - Good! To phir aage kya karna hai?",
+      "Acha, " + userMsg + " - Theek hai, samajh gaya",
+      "Hmm, " + userMsg + " - Hmmm🙂",
+      "Acha acha, " + userMsg + " - Good! ",
       "Samajh gaya, " + userMsg + " - Rana Ali Haider ko bata du kya is bare me?"
     ]);
   }
