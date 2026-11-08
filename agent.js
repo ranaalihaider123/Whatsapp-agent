@@ -19,7 +19,7 @@ app.listen(10000, () => console.log("Server running"));
 function random(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
 
 async function askGemini(userMsg, userId, dateStr) {
-  const models = ["gemini-1.5-flash", "gemini-2.5-flash", "gemini-1.5-flash-8b"];
+ const models = ["gemini-3-8-flash", "gemini-2.0-flash", "gemini-2.0-flash-lite", "gemini-1.5-flash-001"];
   const history = (userMemory[userId] || []).join(" | ");
   for (const model of models) {
     try {
