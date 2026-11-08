@@ -1,6 +1,4 @@
-import express from "express";
-import fetch from "node-fetch";
-
+const express = require("express");
 const app = express();
 app.use(express.json());
 
@@ -9,7 +7,6 @@ const VERIFY_TOKEN = process.env.VERIFY_TOKEN || "mysecret123";
 const WHATSAPP_TOKEN = process.env.WHATSAPP_TOKEN;
 const PHONE_NUMBER_ID = process.env.PHONE_NUMBER_ID;
 
-// Groq - Free, Fast, No Gemini
 async function getAIReply(userMessage) {
   try {
     const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
@@ -47,7 +44,6 @@ async function getAIReply(userMessage) {
   }
 }
 
-// WhatsApp Webhook Verify
 app.get("/webhook", (req, res) => {
   const mode = req.query["hub.mode"];
   const token = req.query["hub.verify_token"];
@@ -59,7 +55,6 @@ app.get("/webhook", (req, res) => {
   }
 });
 
-// WhatsApp Webhook Receive
 app.post("/webhook", async (req, res) => {
   try {
     const entry = req.body.entry?.[0];
