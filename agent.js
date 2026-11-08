@@ -19,20 +19,24 @@ app.listen(10000, () => console.log("Server running"));
 function random(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
 
 async function askGemini(userMsg, userId, dateStr) {
-  try {
-    const history = (userMemory[userId] || []).join(" | ");
-    const res = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" + process.env.GEMINI_API_KEY, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: "You are Rana Ali Haider AI Assistant on WhatsApp. You are like ChatGPT, you can answer ANY question in the world - 11 million questions: Science, History, Maths, Coding, Business, Islam, Pakistan, Health, Sports, Technology, English, Urdu, Stories, Jokes, Advice, Everything. Reply in SAME language user used - if user speaks Roman Urdu, reply in Roman Urdu friendly like a Pakistani best friend. If user speaks English, reply in English. Keep reply natural, helpful, detailed but not too long. Today: " + dateStr + ". Past chat: " + history + ". User said: " + userMsg }] }]
-      })
-    });
-    const data = await res.json();
-    const aiText = data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts[0] && data.candidates[0].content.parts[0].text;
-    if (aiText) return aiText;
-    return null;
-  } catch (e) { return null; }
+  const models = ["gemini-1.5-flash", "gemini-2.5-flash", "gemini-1.5-flash-8b"];
+  const history = (userMemory[userId] || []).join(" | ");
+  for (const model of models) {
+    try {
+      const res = await fetch("https://generativelanguage.googleapis.com/v1beta/models/" + model + ":generateContent?key=" + process.env.GEMINI_API_KEY, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: "You are Rana Ali Haider AI Assistant on WhatsApp, like ChatGPT. Answer ANY question. Reply in SAME language user used - Roman Urdu if user uses Roman Urdu, English if English. Be friendly, natural, varied, never repeat same sentence. Today: " + dateStr + ". Past chat: " + history + ". User said: " + userMsg }] }]
+        })
+      });
+      const data = await res.json();
+      if (data.error) { console.log("Gemini Error " + model + ":", data.error.message); continue; }
+      const aiText = data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts[0] && data.candidates[0].content.parts[0].text;
+      if (aiText) return aiText;
+    } catch (e) { console.log("Gemini Fail " + model, e.message); }
+  }
+  return null;
 }
 
 async function getAIReply(userMsg, userId) {
