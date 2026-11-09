@@ -151,14 +151,14 @@ async function getAIReply(userMsg, userId) {
   }
 
   // 8. BUSINESS
-  if (msg.includes("price") || msg.includes("rate") || msg.includes("kitne ka") || msg.includes("qemat") || msg.includes("cost")) return "Price ke liye batao - kya chahiye aur kitni quantity? Rana Ali Haider aapko best rate denge. Aapka naam aur city kya hai?";
-  if (msg.includes("order") || msg.includes("buy") || msg.includes("book") || msg.includes("lena hai") || msg.includes("chahiye")) return "Zaroor! Order ke liye mujhe ye bata do:\n1. Aapka Naam\n2. Aapka City\n3. Kya chahiye?\n4. Kitne piece?\n\nMain note karke Rana Ali Haider ko bhej dunga.";
-  if (msg.includes("timing") || msg.includes("open") || msg.includes("close") || msg.includes("kab khulta")) return "Hum Subah 10 se Raat 10 tak available hain. Agar abhi baat karni hai to apna naam aur kaam bata dein, Rana Ali Haider jald rabta karenge.";
-  if (msg.includes("location") || msg.includes("kahan") || msg.includes("address") || msg.includes("kidhar") || msg.includes("shop kahan")) return "Hum Lahore, Punjab me hain. Aap kahan se hain? Apna city batao, taake main aapko sahi delivery bata saku.";
+  if (msg.includes("price") || msg.includes("rate") || msg.includes("kitne ka") || msg.includes("qemat") || msg.includes("cost")) return "Oho Ye koi buying , selling platform nhi ha   Personal Chat ha Buddy";
+  if (msg.includes("order") || msg.includes("buy") || msg.includes("book") || msg.includes("lena hai") || msg.includes("chahiye")) return "Kiya 🤔 kiya lena ha ? \n\nMain note karke Rana Ali Haider ko bhej dunga.";
+  if (msg.includes("timing") || msg.includes("open") || msg.includes("close") || msg.includes("kab khulta")) return "Tum bht confusing ho  I can call you discombabulated  Hna , Rana Ali Haider jald rabta karenge.";
+  if (msg.includes("location") || msg.includes("kahan") || msg.includes("address") || msg.includes("kidhar") || msg.includes("shop kahan")) return "Hum Lahore, Punjab me hain. Aap kahan se hain? Apna city batao.";
   if (msg.includes("business") || msg.includes("kaam") || msg.includes("earn")) return "Business ke liye best idea ye hai - Online reselling, Food delivery, ya Digital marketing. Aapko konsa kaam pasand hai? Batao aapke paas kitna budget hai, main full plan bata dunga.";
 
   // 9. JOKES / MOTIVATION / ISLAMIC
-  if (msg.includes("joke") || msg.includes("funny") || msg.includes("hasao") || msg.includes("hansi")) {
+  if (msg.includes("joke") ||msg.includes("latifa") || msg.includes("funny") || msg.includes("hasao") || msg.includes("hansi")) {
     return random([
       "Ek larka teacher se: Sir, mujhe maths nahi aati. Teacher: Koi baat nahi beta, mujhe bhi nahi aati, main to book se dekh kar parhata hoon!",
       "Ek aadmi doctor ke paas gaya: Doctor, mujhe bhoolne ki bimari hai. Doctor: Kab se hai? Aadmi: Kya kab se hai?",
@@ -173,7 +173,7 @@ async function getAIReply(userMsg, userId) {
   if (msg.includes("kya hai") || msg.includes("what is") || msg.includes("kia hai")) {
     return "Acha sawal hai! Aapne poocha: " + userMsg + " - Iske bare me Mujhe nhi pta Rana Sb free ho kr btate han      Main sirf aik agent hoon.";
   }
-  if (msg.includes("kyun") || msg.includes("why") || msg.includes("kion")) {
+  if (msg.includes("kyu") || msg.includes("why") || msg.includes("kyun")) {
     return "Acha, aap pooch rahe ho kyun? Dekho, har cheez ki wajah hoti hai. Aapne poocha: " + userMsg + " - Mujhe thora aur batao, aapko kis cheez ka kyun jaanna hai? Main detail me samjha dunga.";
   }
   if (msg.includes("kese") || msg.includes("kaise") || msg.includes("how to") || msg.includes("kesy")) {
@@ -187,9 +187,9 @@ async function getAIReply(userMsg, userId) {
   if (msg.length < 35) {
     return random([
       "Acha, " + userMsg + " - G",
-      "Hmm, " + userMsg + " - Oh Yeah",
+      "Hmm, " + userMsg + " - Hmm ka matlab nhi pta Mujhe",
       "kiya," + userMsg + " -Ap Mujh se nhi Rana Sb se he bat krna ",
-      "Acha acha, " + userMsg + " - Good! ",
+      "Acha acha, " + userMsg + " - Lagta ha Now you got it! ",
       "Samajh gaya, " + userMsg + " - Rana Ali Haider ko batani han ye batein?"
     ]);
   }
@@ -206,7 +206,7 @@ async function getAIReply(userMsg, userId) {
     if (aiText) return aiText;
   } catch (e) {}
 
-  return "Aapka message mil gaya: " + userMsg + ". Samajh gaya! Aur batao, is bare me aur kya batana hai? Main yahin hoon, sun raha hoon.";
+  return "Aapka message mil gaya: " + userMsg + ". Samajh gaya! Aur batao, is bare me,  Main Rana sb ka agent hn Main yahin hoon, sun raha hoon.";
 }
 
 async function start() {
