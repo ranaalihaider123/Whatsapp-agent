@@ -8,6 +8,10 @@ let lastQR = "";
 let sock = null;
 const userMemory = {};
 
+// ===== ON / OFF SETTINGS =====
+const OWNER_NUMBER = "923027029179"; // <-- Yahan APNA number likho, without +, e.g. 923027029179
+let botEnabled = true; // Bot start me ON rahega
+
 app.get("/", (req, res) => res.send("Bot ON - Rana Ali Haider"));
 app.get("/qr", async (req, res) => {
   if (!lastQR) return res.send("Bot is Connected - No QR needed");
@@ -245,7 +249,7 @@ async function start() {
   });
   sock.ev.on("messages.upsert", async ({ messages }) => {
     const m = messages[0];
-    if (!m.message || m.key.fromMe) return;
+    if (!m.message) return;
 
     // ONLY PRIVATE - NO GROUP REPLY
     const chatId = m.key.remoteJid;
@@ -254,6 +258,34 @@ async function start() {
     if (!chatId.endsWith("@s.whatsapp.net") && !chatId.endsWith("@lid")) return; // Sirf private chat - dono tarah ke
     const text = m.message.conversation || (m.message.extendedTextMessage && m.message.extendedTextMessage.text) || (m.message.imageMessage && m.message.imageMessage.caption) || "";
     if (!text) return;
+
+    // ===== OWNER COMMANDS - ON / OFF / STATUS =====
+    const lowerText = text.trim().toLowerCase();
+    const senderNumber = chatId.split("@")[0];
+    const isOwner = chatId.includes(OWNER_NUMBER) || senderNumber === OWNER_NUMBER || m.key.fromMe;
+
+    if (isOwner) {
+      if (lowerText === "!off") {
+        botEnabled = false;
+        await sock.sendMessage(chatId, { text: "❌ Bot is now OFF.\nMain kisi ko reply nahi karunga.\nWapis ON karne ke liye !on bhejo." });
+        return;
+      }
+      if (lowerText === "!on") {
+        botEnabled = true;
+        await sock.sendMessage(chatId, { text: "✅ Bot is now ON.\nMain sab ko reply karunga." });
+        return;
+      }
+      if (lowerText === "!status") {
+        await sock.sendMessage(chatId, { text: botEnabled ? "🟢 Bot Status: ON\nMain reply kar raha hoon." : "🔴 Bot Status: OFF\nMain chup hoon." });
+        return;
+      }
+      // Agar tum khud apne aap ko koi aur message bhejo to bot reply na kare
+      if (m.key.fromMe) return;
+    }
+
+    // ===== IF BOT IS OFF, IGNORE EVERYONE =====
+    if (!botEnabled) return;
+    if (m.key.fromMe) return;
     const userId = m.key.remoteJid;
     console.log("MSG:", text);
     try {
