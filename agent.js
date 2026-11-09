@@ -225,7 +225,8 @@ async function start() {
     // ONLY PRIVATE - NO GROUP REPLY
     const chatId = m.key.remoteJid;
     if (chatId.endsWith("@g.us")) return; // Group hai to ignore karo
-    if (!chatId.endsWith("@s.whatsapp.net")) return; // Sirf private chat
+    if (chatId.endsWith("@broadcast")) return; // Status ignore karo
+    if (!chatId.endsWith("@s.whatsapp.net") && !chatId.endsWith("@lid")) return; // Sirf private chat - dono tarah ke
     const text = m.message.conversation || (m.message.extendedTextMessage && m.message.extendedTextMessage.text) || (m.message.imageMessage && m.message.imageMessage.caption) || "";
     if (!text) return;
     const userId = m.key.remoteJid;
