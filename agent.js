@@ -183,28 +183,63 @@ async function getAIReply(userMsg, userId) {
     return "Acha, kab wali baat hai! Aapne poocha: " + userMsg + " - Mujhe thora detail batao, main aapko sahi time aur sahi tarika bata dunga.";
   }
 
-  // 11. GENERIC - FOR ANY OTHER MESSAGE - SMART REPLY, NEVER BUSY
-  if (msg.length < 35) {
-    return random([
-      "Acha, " + userMsg + " - G",
-      "Hmm, " + userMsg + " - Yeah",
-      "kiya," + userMsg + " -Ap Mujh se nhi Rana Sb se he bat krna ",
-      "Acha acha, " + userMsg + " - Lagta ha Now you got it! ",
-      "Samajh gaya, " + userMsg + " - Rana Ali Haider ko batani han ye batein?"
-    ]);
+  
+  // 11. GEMINI AI - FOR ALL UNHANDLED MESSAGES
+  try {
+    const apiKey = process.env.GEMINI_API_KEY;
+
+    if (!apiKey) {
+      throw new Error("GEMINI_API_KEY is missing in Render");
+    }
+
+    const response = await fetch(
+      "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-goog-api-key": apiKey
+        },
+        body: JSON.stringify({
+          contents: [{
+            parts: [{
+              text:
+                "You are Rana Ali Haider's personal WhatsApp Agent. " +
+                "Reply naturally like a friendly Pakistani friend. " +
+                "Use Roman Urdu when appropriate. " +
+                "Understand the situation and answer the actual question. " +
+                "Keep replies conversational and reasonably short. " +
+                "Do not repeat generic backup messages. " +
+                "User's message: " + userMsg
+            }]
+          }]
+        })
+      }
+    );
+
+    if (!response.ok) {
+      const errorDetails = await response.text();
+      throw new Error(
+        "Gemini HTTP " + response.status + ": " + errorDetails
+      );
+    }
+
+    const data = await response.json();
+
+    const aiText =
+      data.candidates?.[0]?.content?.parts?.[0]?.text;
+
+    if (aiText) {
+      console.log("GEMINI SUCCESS");
+      return aiText.trim();
+    }
+
+    console.error("Gemini returned no text:", JSON.stringify(data));
+
+  } catch (e) {
+    console.error("GEMINI ERROR:", e.message);
   }
 
-  // 12. LONG MESSAGE - TRY GEMINI, IF FAIL THEN SMART REPLY
-  try {
-    const res = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + process.env.GEMINI_API_KEY, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ contents: [{ parts: [{ text: "You are Rana Ali Haider Agent on WhatsApp. Reply in Roman Urdu like a friendly Pakistani friend. Short, natural, situational. Today: " + dateStr + ". User said: " + userMsg }] }] })
-    });
-    const data = await res.json();
-    const aiText = data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts[0] && data.candidates[0].content.parts[0].text;
-    if (aiText) return aiText;
-  } catch (e) {}
 
   return "Aapka message mil gaya: " + userMsg + ". Samajh gaya! Aur batao, is bare me,  Main Rana sb ka agent hn Main yahin hoon, sun raha hoon.";
 }
