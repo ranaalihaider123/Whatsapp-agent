@@ -187,7 +187,7 @@ async function getAIReply(userMsg, userId) {
   if (msg.length < 35) {
     return random([
       "Acha, " + userMsg + " - G",
-      "Hmm, " + userMsg + " - Hmm ka matlab nhi pta Mujhe",
+      "Hmm, " + userMsg + " - Yeah",
       "kiya," + userMsg + " -Ap Mujh se nhi Rana Sb se he bat krna ",
       "Acha acha, " + userMsg + " - Lagta ha Now you got it! ",
       "Samajh gaya, " + userMsg + " - Rana Ali Haider ko batani han ye batein?"
