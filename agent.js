@@ -184,62 +184,35 @@ async function getAIReply(userMsg, userId) {
   }
 
   
-  // 11. GEMINI AI - FOR ALL UNHANDLED MESSAGES
-  try {
-    const apiKey = process.env.GEMINI_API_KEY;
+ let response;
 
-    if (!apiKey) {
-      throw new Error("GEMINI_API_KEY is missing in Render");
-    }
-
-    const response = await fetch(
-      "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-goog-api-key": apiKey
-        },
-        body: JSON.stringify({
-          contents: [{
-            parts: [{
-              text:
-                "You are Rana Ali Haider's personal WhatsApp Agent. " +
-                "Reply naturally like a friendly Pakistani friend. " +
-                "Use Roman Urdu when appropriate. " +
-                "Understand the situation and answer the actual question. " +
-                "Keep replies conversational and reasonably short. " +
-                "Do not repeat generic backup messages. " +
-                "User's message: " + userMsg
-            }]
+for (let attempt = 1; attempt <= 3; attempt++) {
+  response = await fetch(
+    "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-goog-api-key": process.env.GEMINI_API_KEY
+      },
+      body: JSON.stringify({
+        contents: [{
+          parts: [{
+            text: "Reply naturally in Roman Urdu. Understand the user's situation and answer properly: " + userMsg
           }]
-        })
-      }
+        }]
+      })
+    }
+  );
+
+  if (response.status !== 503 && response.status !== 429) break;
+
+  if (attempt < 3) {
+    await new Promise(resolve =>
+      setTimeout(resolve, attempt * 2000)
     );
-
-    if (!response.ok) {
-      const errorDetails = await response.text();
-      throw new Error(
-        "Gemini HTTP " + response.status + ": " + errorDetails
-      );
-    }
-
-    const data = await response.json();
-
-    const aiText =
-      data.candidates?.[0]?.content?.parts?.[0]?.text;
-
-    if (aiText) {
-      console.log("GEMINI SUCCESS");
-      return aiText.trim();
-    }
-
-    console.error("Gemini returned no text:", JSON.stringify(data));
-
-  } catch (e) {
-    console.error("GEMINI ERROR:", e.message);
   }
-
+}
 
   return "Aapka message mil gaya: " + userMsg + ". Samajh gaya! Aur batao, is bare me,  Main Rana sb ka agent hn Main yahin hoon, sun raha hoon.";
 }
