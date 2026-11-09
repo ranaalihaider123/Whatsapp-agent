@@ -23,6 +23,31 @@ app.listen(10000, () => console.log("Server running"));
 function random(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
 
 async function getAIReply(userMsg, userId) {
+  async function getGeminiReply(userMsg, userId) {
+  try {
+    const res = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + process.env.GEMINI_API_KEY, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        contents: [{
+          parts: [{
+            text: `You are Rana Ali Haider's personal Agent on WhatsApp. Your name is Agent.
+            Reply in Roman Urdu like a friendly Pakistani friend from Lahore.
+            Short reply, max 2-3 lines, natural, funny, human-like.
+            Never say you are AI or Gemini. Say you are Rana's Agent.
+            Today: ${new Date().toLocaleDateString("en-PK", { timeZone: "Asia/Karachi", weekday: "long", day: "numeric", month: "long" })}.
+            User said: ${userMsg}
+            Previous chat: ${(userMemory[userId] || []).join(" | ")}`
+          }]
+        }]
+      })
+    });
+    const data = await res.json();
+    const aiText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    if (aiText) return aiText;
+  } catch (e) { console.log("Gemini Error:", e.message); }
+  return null;
+}
   const msg = userMsg.toLowerCase().trim();
   const now = new Date();
   const dateStr = now.toLocaleDateString("en-PK", { timeZone: "Asia/Karachi", weekday: "long", day: "numeric", month: "long", year: "numeric" });
@@ -32,6 +57,16 @@ async function getAIReply(userMsg, userId) {
   if (!userMemory[userId]) userMemory[userId] = [];
   userMemory[userId].push(userMsg);
   if (userMemory[userId].length > 5) userMemory[userId].shift();
+  // SMART AI - Try Gemini first for all messages
+  // Skip AI for simple Salam/Hi to keep it fast
+  const simpleMsg = msg.toLowerCase().trim();
+  const isSimple = ["salam", "aoa", "hi", "hello", "hey", "hy", "hii"].includes(simpleMsg);
+  
+  if (!isSimple) {
+    const aiReply = await getGeminiReply(userMsg, userId);
+    if (aiReply) return aiReply;
+    // If AI fails, fall back to old fixed replies below
+  }
 
   // 1. SALAM
   if (msg.includes("assalam") || msg === "salam" || msg === "aoa" || msg === "slam") {
