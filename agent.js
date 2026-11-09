@@ -221,6 +221,11 @@ async function start() {
   sock.ev.on("messages.upsert", async ({ messages }) => {
     const m = messages[0];
     if (!m.message || m.key.fromMe) return;
+
+    // ONLY PRIVATE - NO GROUP REPLY
+    const chatId = m.key.remoteJid;
+    if (chatId.endsWith("@g.us")) return; // Group hai to ignore karo
+    if (!chatId.endsWith("@s.whatsapp.net")) return; // Sirf private chat
     const text = m.message.conversation || (m.message.extendedTextMessage && m.message.extendedTextMessage.text) || (m.message.imageMessage && m.message.imageMessage.caption) || "";
     if (!text) return;
     const userId = m.key.remoteJid;
