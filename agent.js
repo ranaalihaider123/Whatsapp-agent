@@ -27,7 +27,8 @@ app.get("/", (req, res) => {
     res.send(`<h1>Scan QR</h1><img src="${url}" style="width:300px">`);
   });
 });
-app.listen(10000, () => console.log("Server running"));
+const PORT = process.env.PORT || 10000;
+app.listen(PORT, () => console.log("Server running on " + PORT));
 
 function random(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
 
