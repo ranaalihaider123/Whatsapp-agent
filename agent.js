@@ -183,36 +183,28 @@ async function getAIReply(userMsg, userId) {
     return "Acha, kab wali baat hai! Aapne poocha: " + userMsg + " - Mujhe thora detail batao, main aapko sahi time aur sahi tarika bata dunga.";
   }
 
-  
- let response;
-
-for (let attempt = 1; attempt <= 3; attempt++) {
-  response = await fetch(
-    "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent",
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-goog-api-key": process.env.GEMINI_API_KEY
-      },
-      body: JSON.stringify({
-        contents: [{
-          parts: [{
-            text: "Reply naturally in Roman Urdu. Understand the user's situation and answer properly: " + userMsg
-          }]
-        }]
-      })
-    }
-  );
-
-  if (response.status !== 503 && response.status !== 429) break;
-
-  if (attempt < 3) {
-    await new Promise(resolve =>
-      setTimeout(resolve, attempt * 2000)
-    );
+  // 11. GENERIC - FOR ANY OTHER MESSAGE - SMART REPLY, NEVER BUSY
+  if (msg.length < 35) {
+    return random([
+      "Acha, " + userMsg + " - G",
+      "Hmm, " + userMsg + " - Yeah",
+      "kiya," + userMsg + " -Ap Mujh se nhi Rana Sb se he bat krna ",
+      "Acha acha, " + userMsg + " - Lagta ha Now you got it! ",
+      "Samajh gaya, " + userMsg + " - Rana Ali Haider ko batani han ye batein?"
+    ]);
   }
-}
+
+  // 12. LONG MESSAGE - TRY GEMINI, IF FAIL THEN SMART REPLY
+  try {
+    const res = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + process.env.GEMINI_API_KEY, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ contents: [{ parts: [{ text: "You are Rana Ali Haider Agent on WhatsApp. Reply in Roman Urdu like a friendly Pakistani friend. Short, natural, situational. Today: " + dateStr + ". User said: " + userMsg }] }] })
+    });
+    const data = await res.json();
+    const aiText = data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts[0] && data.candidates[0].content.parts[0].text;
+    if (aiText) return aiText;
+  } catch (e) {}
 
   return "Aapka message mil gaya: " + userMsg + ". Samajh gaya! Aur batao, is bare me,  Main Rana sb ka agent hn Main yahin hoon, sun raha hoon.";
 }
