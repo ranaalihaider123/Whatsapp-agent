@@ -72,6 +72,18 @@ async function getAIReply(userMsg, userId) {
     return "Allah khair kare! Kya hua hai? Dawai li hai? Aram karo, zyada paani piyo. Allah aapko jald sehat de, Ameen. Doctor ko dikhaya hai?";
   }
 
+// OYE OYE REPLY
+if (
+  msg === "oye" ||
+  msg === "oye oye" ||
+  msg === "oyee" ||
+  msg === "oye oyee" ||
+  msg === "oye!" ||
+  msg === "oye oye!"
+) {
+  return "Oye oye kr ke nhi bat kro! Main AI hn, is ka matlab ye nhi Ap slanging use kro. Okay 👍";
+}
+
   // 3. WHERE ARE YOU / WHAT DOING
   if (msg.includes("where are you") || msg.includes("kahan ho") || msg.includes("kidhar ho") || msg.includes("kaha ho") || msg.includes("Oye")) {
     return random([
@@ -121,9 +133,22 @@ async function getAIReply(userMsg, userId) {
   if (msg.includes("date") || msg.includes("aaj kya") || msg.includes("tarikh")) return "Aaj ki date hai: " + dateStr + "\nAaj ka din hai: " + dayStr + "\nTime abhi: " + timeStr + " Pakistan Time.\n\nAur batao, aaj ka kya plan hai?";
   if (msg.includes("din konsa") || msg === "day") return "Aaj " + dayStr + " hai! Date: " + dateStr + "\n\nAapka kya plan hai aaj ka?";
   if (msg.includes("time") || msg.includes("waqt") || msg.includes("baj")) return "Abhi Pakistan me time hai: " + timeStr + "\nDate: " + dateStr + "\n\nTime ka sahi use hi kamyabi hai!";
-
+// BAND KARNE WALA REPLY
+if (
+  msg.includes("band kr") ||
+  msg.includes("band kro") ||
+  msg.includes("band kar") ||
+  msg.includes("band karo") ||
+  msg.includes("band kar do") ||
+  msg.includes("band kro isse") ||
+  msg.includes("band kar isse") ||
+  msg.includes("band kar do isse") ||
+  msg.includes("band karo isse")
+) {
+  return "Khud bnd ho jao! Mujhe bnd krne ka kyu keh rhe ho 😡";
+}
   // 6. BYE / THANKS / OK
-  if (msg.includes("allah hafiz") || msg.includes("bye") || msg.includes("khuda hafiz") || msg.includes("goodbye") || msg.includes("ja raha") && msg.includes("allah")) {
+  if (msg.includes("allah hafiz") || msg.includes("bye") || msg.includes("okay") || msg.includes("khuda hafiz") || msg.includes("goodbye") || msg.includes("ja raha") && msg.includes("allah")) {
     return random([
       "Allah Hafiz! Apna khayal rakhna. Jab zaroorat ho to message kar dena.",
       "Allah Hafiz! Phir milenge. Dua me yaad rakhna. Main yahin hoon jab bhi zaroorat ho!",
