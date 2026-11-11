@@ -11,7 +11,19 @@ const userMemory = {};
 // ===== ON / OFF SETTINGS =====
 const OWNER_NUMBER = "923027029179"; // <-- Yahan APNA number likho, without +, e.g. 923027029179
 let botEnabled = true; // Bot start me ON rahega
+// ===== STICKER LIST =====
+const STICKERS = {
+  salam: "https://api.sticker.ly/sticker/full/e1c4b9e1d8f2e1a3b4c5d6e7f8a9b0c/123.webp",
+  happy: "https://media.tenor.com/1X2Y3Z4A5B6C/sticker.webp",
+  funny: "https://i.imgur.com/8QmJxYQ.webp"
+};
 
+// Simple sticker bhejne wala function
+async function sendSticker(chatId, stickerUrl) {
+  try {
+    await sock.sendMessage(chatId, { sticker: { url: stickerUrl } });
+  } catch(e) { console.log("Sticker Error", e.message); }
+}
 app.get("/", (req, res) => res.send("Bot ON - Rana Ali Haider"));
 app.get("/qr", async (req, res) => {
   if (!lastQR) return res.send("Bot is Connected - No QR needed");
@@ -290,8 +302,28 @@ async function start() {
     console.log("MSG:", text);
     try {
       await sock.sendPresenceUpdate("composing", userId);
-      const reply = await getAIReply(text, userId);
-      await sock.sendMessage(userId, { text: reply });
+     const reply = await getAIReply(text, userId);
+
+// ===== STICKER LOGIC =====
+const lower = text.toLowerCase();
+
+if (lower.includes("salam") || lower.includes("aoa")) {
+  // Pehle sticker, phir text
+  await sock.sendMessage(userId, { sticker: { url: "https://cdn.sticker.ly/sticker/full/abc123.webp" } });
+  await sock.sendMessage(userId, { text: reply });
+}
+else if (lower.includes("joke") || lower.includes("funny") || lower.includes("hasao")) {
+  await sock.sendMessage(userId, { sticker: { url: "https://cdn.sticker.ly/sticker/full/funny123.webp" } });
+  await sock.sendMessage(userId, { text: reply });
+}
+else if (lower.includes("sticker")) {
+  // Agar banda khud "sticker" likhe to sirf sticker bhejo, text nahi
+  await sock.sendMessage(userId, { sticker: { url: "https://cdn.sticker.ly/sticker/full/abc123.webp" } });
+}
+else {
+  // Normal message - sirf text
+  await sock.sendMessage(userId, { text: reply });
+}
     } catch (e) { console.log("Send Error", e.message); }
   });
 }
