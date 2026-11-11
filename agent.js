@@ -8,7 +8,7 @@ let lastQR = "";
 let sock = null;
 
 // ===== ON / OFF =====
-const OWNER_NUMBER = "923001234567"; // Put your own number here without +
+const OWNER_NUMBER = "923027029179"; // Put your own number here without +
 let botEnabled = true;
 
 app.get("/", (req, res) => res.send("<h1>Bot is Running - English Medium</h1><a href='/qr'>Click for QR</a>"));
